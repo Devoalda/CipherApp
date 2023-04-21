@@ -1,0 +1,138 @@
+<div class="form-group">
+    <form method="POST" action="{{ url_for('encrypt_decrypt') }}">
+        <label for="plaintext_input">
+            Enter Plaintext Here:
+        </label>
+        <input type="text" id="plaintext_input" name="plaintext_input"
+               placeholder="Enter your text here" class="form-control">
+        <div class="form-group">
+            <label for="key-input">Shift Value:</label>
+            <div class="input-group">
+    <span class="input-group-prepend">
+      <button class="btn btn-outline-secondary" type="button" onclick="decrementKey()">-</button>
+    </span>
+                <input type="text" id="key-input" name="key" class="form-control" min="1" max="1000000000000000"
+                       value="3" oninput="updateSliderValue()">
+                <span class="input-group-append">
+      <button class="btn btn-outline-secondary" type="button" onclick="incrementKey()">+</button>
+    </span>
+            </div>
+        </div>
+        <div>
+            <label for="key-slider">
+                Enter shift value:
+            </label>
+            <input type="range" id="key-slider" name="key" min="1" max="1000000000000000"
+                   value="3"
+                   class="form-control" oninput="updateKeyInput()">
+        </div>
+        <div class="custom-file">
+            <input type="file" id="file-input" onchange="updateLabel()">
+            <label for="file-input" id="file-label">Choose file</label>
+            <button id="remove-file-btn" onclick="removeFile()" style="display: none;">Remove</button>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-group alert alert-success">
+                        <label for="ciphertext">Cipher Text:</label>
+                        <input type="text" id="ciphertext" name="ciphertext" placeholder="Cipher Text"
+                               class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-group">
+                        <label for="cleartext">Clear Text:</label>
+                        <input type="text" id="cleartext" name="cleartext" placeholder="Clear Text"
+                               class="form-control" readonly >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function update() {
+        let plaintext = document.getElementById('plaintext_input').value;
+        let key = document.getElementById('key-slider').value;
+        let pad_file = document.getElementById('file-input').files[0];
+
+        let formData = new FormData();
+        formData.append('plaintext_input', plaintext);
+        formData.append('key', key);
+        formData.append('pad_file', pad_file);
+
+        let xhrEncrypt = new XMLHttpRequest();
+        xhrEncrypt.open('POST', '{{ url_for("encrypt_decrypt") }}');
+        xhrEncrypt.onload = function () {
+            let ciphertext = JSON.parse(xhrEncrypt.responseText)['ciphertext'];
+            let cleartext = JSON.parse(xhrEncrypt.responseText)['cleartext'];
+            document.getElementById('ciphertext').value = ciphertext;
+            document.getElementById('cleartext').value = cleartext;
+        };
+        xhrEncrypt.send(formData);
+    }
+
+    function updateSliderValue() {
+        document.getElementById('key-slider').value = document.getElementById('key-input').value;
+        update();
+    }
+
+    function updateKeyInput() {
+        document.getElementById('key-input').value = document.getElementById('key-slider').value;
+        update();
+    }
+
+    function incrementKey() {
+        let keyInput = document.getElementById('key-input');
+        let currentValue = parseInt(keyInput.value);
+        if (currentValue < parseInt(keyInput.max)) {
+            keyInput.value = currentValue + 1;
+            updateSliderValue();
+        }
+    }
+
+    function decrementKey() {
+        let keyInput = document.getElementById('key-input');
+        let currentValue = parseInt(keyInput.value);
+        if (currentValue > parseInt(keyInput.min)) {
+            keyInput.value = currentValue - 1;
+            updateSliderValue();
+        }
+    }
+
+    function updateLabel() {
+        let fileInput = document.getElementById('file-input');
+        let fileLabel = document.getElementById('file-label');
+        let removeBtn = document.getElementById('remove-file-btn');
+
+        if (fileInput.value) {
+            fileLabel.innerHTML = fileInput.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1];
+            removeBtn.style.display = 'inline-block';
+        } else {
+            fileLabel.innerHTML = 'Choose file';
+            removeBtn.style.display = 'none';
+        }
+    }
+
+    function removeFile() {
+        let fileInput = document.getElementById('file-input');
+        let fileLabel = document.getElementById('file-label');
+        let removeBtn = document.getElementById('remove-file-btn');
+
+        fileInput.value = '';
+        fileLabel.innerHTML = 'Choose file';
+        removeBtn.style.display = 'none';
+    }
+
+    document.getElementById('plaintext_input').addEventListener('input', update);
+    document.getElementById('key-slider').addEventListener('input', updateKeyInput);
+    document.getElementById('key-input').addEventListener('input', updateSliderValue);
+</script>
+
+

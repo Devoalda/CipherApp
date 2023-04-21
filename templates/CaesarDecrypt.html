@@ -1,0 +1,142 @@
+<div class="form-group">
+    <form method="POST" action="{{ url_for('encrypt_decrypt') }}">
+        <label for="ciphertext_input">
+            Enter Cipher text here:
+        </label>
+        <input type="text" id="ciphertext_input" name="ciphertext_input"
+               placeholder="Enter your text here" class="form-control">
+        <div class="form-group">
+            <label for="key-input-decrypt">Shift Value:</label>
+            <div class="input-group">
+      <span class="input-group-prepend">
+        <button class="btn btn-outline-secondary" type="button" onclick="decrementKeyDecrypt()">-</button>
+      </span>
+                <label for="key-input-decrypt"></label><input type="text" id="key-input-decrypt"
+                                                              name="key-input-decrypt" class="form-control" min="1"
+                                                              max="1000000000000000" value="3"
+                                                              oninput="updateSliderValue()">
+                <span class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" onclick="incrementKeyDecrypt()">+</button>
+          </span>
+            </div>
+        </div>
+        <div>
+            <label for="key-slider-decrypt">
+                Enter Shift Value
+            </label>
+            <input type="range" id="key-slider-decrypt" name="key" min="1"
+                   max="1000000000000000" value="3" class="form-control"
+                   oninput="updateKeyInput()">
+        </div>
+        <div class="custom-file">
+            <span class="string">Upload pad file:</span>
+            <input type="file" id="file-input-decrypt" onchange="updateLabelDecrypt()">
+            <label for="file-input-decrypt" id="file-label-decrypt">Choose file</label>
+            <button id="remove-file-btn-decrypt" onclick="removeFileDecrypt()" style="display: none;">Remove
+            </button>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-group">
+                        <label for="ciphertext-decrypt">Cipher Text:</label><input type="text" id="ciphertext-decrypt"
+                                                                                   name="ciphertext-decrypt"
+                                                                                   placeholder="Cipher Text"
+                                                                                   class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-group alert alert-success">
+                        <label for="cleartext-decrypt">Clear Text:</label>
+                        <input type="text" id="cleartext-decrypt" name="cleartext-decrypt" placeholder="Clear Text"
+                               class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function update_decrypt() {
+        let ciphertext = document.getElementById('ciphertext_input').value;
+        let key = document.getElementById('key-slider-decrypt').value;
+        {#let xhrEncrypt = new XMLHttpRequest();#}
+        let pad_file = document.getElementById('file-input').files[0];
+
+        let formData = new FormData();
+        formData.append('ciphertext_input', ciphertext);
+        formData.append('key', key);
+        formData.append('pad_file', pad_file);
+
+        let xhrEncrypt = new XMLHttpRequest();
+        xhrEncrypt.open('POST', '{{ url_for("encrypt_decrypt") }}');
+        xhrEncrypt.onload = function () {
+            let ciphertext = JSON.parse(xhrEncrypt.responseText)['ciphertext'];
+            let cleartext = JSON.parse(xhrEncrypt.responseText)['cleartext'];
+            document.getElementById('ciphertext-decrypt').value = ciphertext;
+            document.getElementById('cleartext-decrypt').value = cleartext;
+        };
+        xhrEncrypt.send(formData);
+    }
+
+    function updateSliderValueDecrypt() {
+        document.getElementById('key-slider-decrypt').value = document.getElementById('key-input-decrypt').value;
+        update_decrypt();
+    }
+
+    function updateKeyInputDecrypt() {
+        document.getElementById('key-input-decrypt').value = document.getElementById('key-slider-decrypt').value;
+        update_decrypt();
+    }
+
+    function incrementKeyDecrypt() {
+        let keyInput = document.getElementById('key-input-decrypt');
+        let currentValue = parseInt(keyInput.value);
+        if (currentValue < parseInt(keyInput.max)) {
+            keyInput.value = currentValue + 1;
+            updateSliderValueDecrypt();
+        }
+    }
+
+    function decrementKeyDecrypt() {
+        let keyInput = document.getElementById('key-input-decrypt');
+        let currentValue = parseInt(keyInput.value);
+        if (currentValue > parseInt(keyInput.min)) {
+            keyInput.value = currentValue - 1;
+            updateSliderValueDecrypt();
+        }
+    }
+
+    function updateLabelDecrypt() {
+        let fileInput = document.getElementById('file-input-decrypt');
+        let fileLabel = document.getElementById('file-label-decrypt');
+        let removeBtn = document.getElementById('remove-file-btn-decrypt');
+
+        if (fileInput.value) {
+            fileLabel.innerHTML = fileInput.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1];
+            removeBtn.style.display = 'inline-block';
+        } else {
+            fileLabel.innerHTML = 'Choose file';
+            removeBtn.style.display = 'none';
+        }
+    }
+
+    function removeFileDecrypt() {
+        let fileInput = document.getElementById('file-input-decrypt');
+        let fileLabel = document.getElementById('file-label-decrypt');
+        let removeBtn = document.getElementById('remove-file-btn-decrypt');
+
+        fileInput.value = '';
+        fileLabel.innerHTML = 'Choose file';
+        removeBtn.style.display = 'none';
+    }
+
+    document.getElementById('ciphertext_input').addEventListener('input', update_decrypt);
+    document.getElementById('key-slider-decrypt').addEventListener('input', updateKeyInputDecrypt);
+    document.getElementById('key-input-decrypt').addEventListener('input', updateSliderValueDecrypt);
+</script>

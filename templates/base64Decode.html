@@ -1,0 +1,30 @@
+<div class="form-group">
+    <form method="POST" action="{{ url_for('b64') }}">
+        <label for="b64_plaintext_input_decrypt">Enter Cipher Text Here:</label>
+        <input type="text" id="b64_plaintext_input_decrypt" name="b64_plaintext_input_decrypt"
+                                                    placeholder="Enter your text here" class="form-control">
+        <div class="alert alert-success">
+        <label for="b64_ciphertext_decrypt">
+            Clear Text:
+        </label>
+        <input type="text" id="b64_ciphertext_decrypt" name="b64_ciphertext_decrypt"
+                                               placeholder="Cipher Text" class="form-control" readonly>
+        </div>
+    </form>
+</div>
+
+<script>
+    function b64DecryptUpdate(){
+        let plaintext = document.getElementById("b64_plaintext_input_decrypt").value;
+        let formData = new FormData();
+        formData.append('b64_ciphertext_input', plaintext);
+
+        let xhrRequest = new XMLHttpRequest();
+        xhrRequest.open('POST', '/b64');
+        xhrRequest.onload = function(){
+            document.getElementById("b64_ciphertext_decrypt").value = JSON.parse(xhrRequest.responseText)['cleartext'];
+        };
+        xhrRequest.send(formData);
+    }
+    document.getElementById('b64_plaintext_input_decrypt').addEventListener('input', b64DecryptUpdate);
+</script>
