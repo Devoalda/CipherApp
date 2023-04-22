@@ -1,5 +1,5 @@
 <div class="form-group">
-    <form method="POST" action="{{ url_for('encrypt_decrypt') }}">
+    <form method="POST" action="{{ url_for('CaesarCipherED') }}">
         <label for="ciphertext_input">
             Enter Cipher text here:
         </label>
@@ -54,6 +54,7 @@
                         <label for="cleartext-decrypt">Clear Text:</label>
                         <input type="text" id="cleartext-decrypt" name="cleartext-decrypt" placeholder="Clear Text"
                                class="form-control" readonly>
+                        <span onclick="copyToClipboardCaesarDecrypt()" class="btn btn-primary">Copy to Clipboard</span>
                     </div>
                 </div>
             </div>
@@ -74,7 +75,7 @@
         formData.append('pad_file', pad_file);
 
         let xhrEncrypt = new XMLHttpRequest();
-        xhrEncrypt.open('POST', '{{ url_for("encrypt_decrypt") }}');
+        xhrEncrypt.open('POST', '{{ url_for("CaesarCipherED") }}');
         xhrEncrypt.onload = function () {
             let ciphertext = JSON.parse(xhrEncrypt.responseText)['ciphertext'];
             let cleartext = JSON.parse(xhrEncrypt.responseText)['cleartext'];
@@ -134,6 +135,12 @@
         fileInput.value = '';
         fileLabel.innerHTML = 'Choose file';
         removeBtn.style.display = 'none';
+    }
+
+    function copyToClipboardCaesarDecrypt() {
+        const ciphertextInput = document.getElementById("cleartext-decrypt");
+        ciphertextInput.select();
+        document.execCommand("copy");
     }
 
     document.getElementById('ciphertext_input').addEventListener('input', update_decrypt);

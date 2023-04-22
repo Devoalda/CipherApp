@@ -9,6 +9,7 @@
             </label>
             <input type="text" id="b64_ciphertext" name="b64_ciphertext"
                    placeholder="Cipher Text" class="form-control" readonly>
+            <span onclick="copyToClipboardB64Encrypt()" class="btn btn-primary">Copy to Clipboard</span>
         </div>
     </form>
 </div>
@@ -25,6 +26,12 @@
             document.getElementById("b64_ciphertext").value = JSON.parse(xhrRequest.responseText)['ciphertext'];
         };
         xhrRequest.send(formData);
+    }
+
+    function copyToClipboardB64Encrypt() {
+        const ciphertextInput = document.getElementById("b64_ciphertext");
+        ciphertextInput.select();
+        document.execCommand("copy");
     }
 
     document.getElementById('b64_plaintext_input').addEventListener('input', b64Update);

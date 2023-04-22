@@ -1,5 +1,5 @@
-import io
 import base64
+import io
 
 from flask import Flask, render_template, request, jsonify
 
@@ -32,14 +32,13 @@ def b64():
     else:
         sample_string_bytes = text.encode("ascii")
         base64_bytes = base64.b64encode(sample_string_bytes)
-        # print(f'Encoded string: {base64_bytes.decode("ascii")}')
         result['ciphertext'] = str(base64_bytes.decode("ascii"))
 
     return jsonify(result)
 
 
-@app.route('/encrypt_decrypt', methods=['POST'])
-def encrypt_decrypt():
+@app.route('/CaesarCipherED', methods=['POST'])
+def CaesarCipherED():
     if 'plaintext_input' in request.form:
         text = request.form['plaintext_input']
         ciphertext_input = False

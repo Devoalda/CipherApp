@@ -1,5 +1,5 @@
 <div class="form-group">
-    <form method="POST" action="{{ url_for('encrypt_decrypt') }}">
+    <form method="POST" action="{{ url_for('CaesarCipherED') }}">
         <label for="plaintext_input">
             Enter Plaintext Here:
         </label>
@@ -38,6 +38,7 @@
                         <label for="ciphertext">Cipher Text:</label>
                         <input type="text" id="ciphertext" name="ciphertext" placeholder="Cipher Text"
                                class="form-control" readonly>
+                        <span onclick="copyToClipboardCaesarEncrypt()" class="btn btn-outline-secondary">Copy to Clipboard</span>
                     </div>
                 </div>
             </div>
@@ -48,7 +49,7 @@
                     <div class="form-group">
                         <label for="cleartext">Clear Text:</label>
                         <input type="text" id="cleartext" name="cleartext" placeholder="Clear Text"
-                               class="form-control" readonly >
+                               class="form-control" readonly>
                     </div>
                 </div>
             </div>
@@ -68,7 +69,7 @@
         formData.append('pad_file', pad_file);
 
         let xhrEncrypt = new XMLHttpRequest();
-        xhrEncrypt.open('POST', '{{ url_for("encrypt_decrypt") }}');
+        xhrEncrypt.open('POST', '{{ url_for("CaesarCipherED") }}');
         xhrEncrypt.onload = function () {
             let ciphertext = JSON.parse(xhrEncrypt.responseText)['ciphertext'];
             let cleartext = JSON.parse(xhrEncrypt.responseText)['cleartext'];
@@ -128,6 +129,13 @@
         fileInput.value = '';
         fileLabel.innerHTML = 'Choose file';
         removeBtn.style.display = 'none';
+    }
+
+    function copyToClipboardCaesarEncrypt() {
+        const ciphertextInput = document.getElementById("ciphertext");
+        ciphertextInput.select();
+        document.execCommand("copy");
+        alert("Copied to clipboard!");
     }
 
     document.getElementById('plaintext_input').addEventListener('input', update);

@@ -21,26 +21,17 @@ class CaesarCipher:
 
         self.shift = shift
         self.default_pad_length = 100
-        self.file_type_dict = {
-            '.txt': {
-                'function': self.convert_txt_to_list,
-                'default_file_name': 'pad.txt'
-            },
-            '.csv': {
-                'function': self.convert_csv_to_list,
-                'default_file_name': 'pad.csv'
-            }
-        }
+        self.file_type_dict = {'.txt': {'function': self.convert_txt_to_list, 'default_file_name': 'pad.txt'},
+                               '.csv': {'function': self.convert_csv_to_list, 'default_file_name': 'pad.csv'}}
 
-        if use_pad is False:
+        if not use_pad:
             self.pad = deque([0] * self.default_pad_length)
         else:
             if file_name:
                 file_name, file_extension = os.path.splitext(file_name)
-                print(f'{file_name}, {file_extension}')
                 if file_extension in self.file_type_dict:
                     self.file_type_dict[file_extension]["function"](file_name + file_extension)
-            if file:
+            elif file:
                 self.read_file(file)
             else:
                 self.pad = pad if pad else self.gen_pad(self.default_pad_length)
@@ -50,6 +41,8 @@ class CaesarCipher:
         Read file object into deque, space delimited or comma delimited
         :param file: file object to read
         :type file: IO[str]
+        :return: None
+        :rtype: None
         """
         # Try space delimited, then comma delimited
         try:
@@ -94,7 +87,7 @@ class CaesarCipher:
                 pad_val = self.get_pad()
                 result += chr((ord(char) + self.shift - 65 + pad_val) % 26 + 65) if char.isupper() else chr(
                     (ord(char) + self.shift - 97 + pad_val) % 26 + 97)
-        print(f'Result: {result}')
+        # print(f'Result: {result}')
         return result
 
     def decrypt(self, cipher_text: str) -> str:
@@ -166,6 +159,7 @@ class CaesarCipher:
                 pad = [int(i) for i in pad.split(' ') if i.strip()]
                 self.pad = deque(pad)
 
+
         except FileNotFoundError:
             print(f'File {file_name} not found. Please check the file name and try again.')
             exit(1)
@@ -196,6 +190,12 @@ if __name__ == "__main__":
     enc = cipher.encrypt(text)
 
     decipher = CaesarCipher(40, use_pad=False)
+    dec = decipher.decrypt(enc)
+
+    cipher2 = CaesarCipher(40, use_pad=True, file_name='./pad.txt')
+    enc = cipher.encrypt(text)
+
+    decipher2 = CaesarCipher(40, use_pad=True, file_name='./pad.txt')
     dec = decipher.decrypt(enc)
 
     print(f'Original: {text}')
