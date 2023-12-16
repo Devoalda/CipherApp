@@ -1,6 +1,6 @@
 # Cipher App
 
-This is a simple cipher app that features:
+This is a simple cipher web application that features:
 
 - Caesar Cipher
 - Base64 Encoding/Decoding
